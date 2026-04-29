@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Обери три</title>
+  <link rel="icon" href="/favicon.ico" type="image/svg+xml">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html { height: 100%; }
+    body {
+      margin: 0;
+      min-height: 100%;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      font-size: 1rem;
+      line-height: 1.5;
+      color: #edecf4;
+      background: #1a1b26;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(1rem, 4vw, 2rem);
+    }
+    .game {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: clamp(1.5rem, 5vw, 2.25rem);
+      max-width: 100%;
+    }
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      justify-content: center;
+      gap: clamp(0.75rem, 5vw, 1.5rem);
+      max-width: 100%;
+    }
+    .slot {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .label {
+      font-size: clamp(1.25rem, 5vw, 1.75rem);
+      line-height: 1;
+      user-select: none;
+    }
+    .square {
+      width: min(22vw, 5.5rem);
+      height: min(22vw, 5.5rem);
+      min-width: 4.25rem;
+      min-height: 4.25rem;
+      border: 2px solid #3a3f58;
+      border-radius: 0.5rem;
+      background: #232330;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: clamp(1.75rem, 8vw, 2.5rem);
+      line-height: 1;
+      transition: border-color 0.15s, background 0.15s;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .square:hover, .square:focus-visible {
+      border-color: #6c9cff;
+      outline: none;
+    }
+    .square:focus-visible {
+      box-shadow: 0 0 0 3px rgba(108, 156, 255, 0.35);
+    }
+    .square .placeholder { color: #5c627a; font-size: 0.9rem; }
+
+    .submit-btn {
+      appearance: none;
+      border: none;
+      cursor: pointer;
+      min-width: min(100%, 16rem);
+      padding: 0.875rem 2rem;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      color: #f8fafc;
+      background: linear-gradient(165deg, #7d9fff 0%, #5b7fff 45%, #4a6fee 100%);
+      border-radius: 999px;
+      box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.2) inset,
+        0 4px 14px rgba(91, 127, 255, 0.45),
+        0 2px 4px rgba(0, 0, 0, 0.25);
+      transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .submit-btn:hover {
+      filter: brightness(1.06);
+      box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.25) inset,
+        0 6px 20px rgba(91, 127, 255, 0.55),
+        0 2px 6px rgba(0, 0, 0, 0.3);
+    }
+    .submit-btn:active {
+      transform: translateY(1px);
+      filter: brightness(0.96);
+      box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.15) inset,
+        0 2px 8px rgba(91, 127, 255, 0.35),
+        0 1px 2px rgba(0, 0, 0, 0.35);
+    }
+    .submit-btn:focus-visible {
+      outline: none;
+      box-shadow:
+        0 0 0 3px rgba(108, 156, 255, 0.45),
+        0 4px 14px rgba(91, 127, 255, 0.45),
+        0 2px 4px rgba(0, 0, 0, 0.25);
+    }
+
+    .backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.48);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      z-index: 100;
+    }
+    .backdrop.open { display: flex; }
+    .sheet {
+      background: #282836;
+      border: 1px solid #3a3f58;
+      border-radius: 0.75rem;
+      padding: 1rem;
+      max-width: min(22rem, 100%);
+      max-height: min(70vh, 28rem);
+      overflow: auto;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.38);
+    }
+    .sheet h2 {
+      margin: 0 0 0.75rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #a8adbf;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(2.75rem, 1fr));
+      gap: 0.35rem;
+    }
+    .emoji-btn {
+      min-width: 2.75rem;
+      min-height: 2.75rem;
+      padding: 0;
+      border: 1px solid transparent;
+      border-radius: 0.35rem;
+      background: #303040;
+      font-size: 1.5rem;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .emoji-btn:hover, .emoji-btn:focus-visible {
+      border-color: #6c9cff;
+      background: #363d5a;
+      outline: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="game">
+  <div class="row" id="row">
+    <div class="slot" data-key="a">
+      <span class="label" aria-hidden="true">1️⃣</span>
+      <button type="button" class="square" data-index="0" aria-label="Оберіть емодзі для першого квадрата">
+        <span class="placeholder">Торкніться</span>
+      </button>
+    </div>
+    <div class="slot" data-key="b">
+      <span class="label" aria-hidden="true">2️⃣</span>
+      <button type="button" class="square" data-index="1" aria-label="Оберіть емодзі для другого квадрата">
+        <span class="placeholder">Торкніться</span>
+      </button>
+    </div>
+    <div class="slot" data-key="c">
+      <span class="label" aria-hidden="true">3️⃣</span>
+      <button type="button" class="square" data-index="2" aria-label="Оберіть емодзі для третього квадрата">
+        <span class="placeholder">Торкніться</span>
+      </button>
+    </div>
+  </div>
+
+  <button type="button" class="submit-btn" id="submit-btn">Відправити</button>
+  </div>
+
+  <div class="backdrop" id="backdrop" aria-hidden="true">
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="picker-title">
+      <h2 id="picker-title">Оберіть емодзі</h2>
+      <div class="grid" id="grid"></div>
+    </div>
+  </div>
+
+  <script>
+    window.__EMOJI__ = {{.EmojiJSON}};
+  </script>
+  <script>
+(function () {
+  var lists = window.__EMOJI__;
+  var keys = ['a', 'b', 'c'];
+  var squares = document.querySelectorAll('.square');
+  var backdrop = document.getElementById('backdrop');
+  var grid = document.getElementById('grid');
+  var activeIndex = 0;
+  var squareLabels = ['першого', 'другого', 'третього'];
+
+  function openPicker(index) {
+    activeIndex = index;
+    var key = keys[index];
+    var items = lists[key] || [];
+    grid.textContent = '';
+    items.forEach(function (emo) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'emoji-btn';
+      btn.textContent = emo;
+      btn.addEventListener('click', function () {
+        setSquare(activeIndex, emo);
+        closePicker();
+      });
+      grid.appendChild(btn);
+    });
+    backdrop.classList.add('open');
+    backdrop.setAttribute('aria-hidden', 'false');
+  }
+
+  function closePicker() {
+    backdrop.classList.remove('open');
+    backdrop.setAttribute('aria-hidden', 'true');
+  }
+
+  function setSquare(index, emoji) {
+    var sq = squares[index];
+    sq.textContent = emoji;
+    sq.setAttribute('aria-label', 'Змінити емодзі для ' + squareLabels[index] + ' квадрата, зараз ' + emoji);
+  }
+
+  squares.forEach(function (sq, i) {
+    sq.addEventListener('click', function () { openPicker(i); });
+  });
+
+  backdrop.addEventListener('click', function (e) {
+    if (e.target === backdrop) closePicker();
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && backdrop.classList.contains('open')) closePicker();
+  });
+})();
+  </script>
+</body>
+</html>
