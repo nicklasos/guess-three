@@ -74,7 +74,51 @@
       box-shadow: 0 0 0 3px rgba(108, 156, 255, 0.35);
     }
     .square .placeholder { color: #5c627a; font-size: 0.9rem; }
+    .square:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+    .square:disabled:hover { border-color: #3a3f58; }
 
+    .status-slot {
+      box-sizing: border-box;
+      min-height: 3rem;
+      width: min(100%, 22rem);
+      margin: 0;
+      padding: 0.75rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 0.95rem;
+      line-height: 1.35;
+      color: #e0b8bc;
+      background: rgba(180, 72, 82, 0.12);
+      border: 1px solid rgba(195, 95, 102, 0.5);
+      border-radius: 0.5rem;
+    }
+    .status-slot:empty {
+      background: transparent;
+      border-color: transparent;
+      color: transparent;
+    }
+    .status-slot.is-final {
+      color: #f0cfd2;
+      background: rgba(190, 75, 85, 0.18);
+      border-color: rgba(210, 120, 125, 0.6);
+      font-weight: 500;
+    }
+
+    .submit-zone {
+      min-height: 3.25rem;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .submit-btn[hidden] {
+      display: none;
+    }
     .submit-btn {
       appearance: none;
       border: none;
@@ -116,6 +160,23 @@
         0 0 0 3px rgba(108, 156, 255, 0.45),
         0 4px 14px rgba(91, 127, 255, 0.45),
         0 2px 4px rgba(0, 0, 0, 0.25);
+    }
+    .submit-btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      filter: grayscale(0.15);
+      transform: none;
+      box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.12) inset,
+        0 2px 8px rgba(91, 127, 255, 0.2),
+        0 1px 2px rgba(0, 0, 0, 0.2);
+    }
+    .submit-btn:disabled:hover {
+      filter: grayscale(0.15);
+      box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.12) inset,
+        0 2px 8px rgba(91, 127, 255, 0.2),
+        0 1px 2px rgba(0, 0, 0, 0.2);
     }
 
     .backdrop {
@@ -177,25 +238,29 @@
   <div class="row" id="row">
     <div class="slot" data-key="a">
       <span class="label" aria-hidden="true">1️⃣</span>
-      <button type="button" class="square" data-index="0" aria-label="Оберіть емодзі для першого квадрата">
+      <button type="button" class="square" data-index="0" aria-label="Оберіть емодзі для першого квадрата"{{if .Locked}} disabled{{end}}>
         <span class="placeholder">Торкніться</span>
       </button>
     </div>
     <div class="slot" data-key="b">
       <span class="label" aria-hidden="true">2️⃣</span>
-      <button type="button" class="square" data-index="1" aria-label="Оберіть емодзі для другого квадрата">
+      <button type="button" class="square" data-index="1" aria-label="Оберіть емодзі для другого квадрата"{{if .Locked}} disabled{{end}}>
         <span class="placeholder">Торкніться</span>
       </button>
     </div>
     <div class="slot" data-key="c">
       <span class="label" aria-hidden="true">3️⃣</span>
-      <button type="button" class="square" data-index="2" aria-label="Оберіть емодзі для третього квадрата">
+      <button type="button" class="square" data-index="2" aria-label="Оберіть емодзі для третього квадрата"{{if .Locked}} disabled{{end}}>
         <span class="placeholder">Торкніться</span>
       </button>
     </div>
   </div>
 
-  <button type="button" class="submit-btn" id="submit-btn">Відправити</button>
+  <p class="status-slot{{if .Locked}} is-final{{end}}" id="status-slot" role="status" aria-live="polite">{{.StatusText}}</p>
+
+  <div class="submit-zone">
+  <button type="button" class="submit-btn" id="submit-btn"{{if .Locked}} hidden{{end}}>Відправити</button>
+  </div>
   </div>
 
   <div class="backdrop" id="backdrop" aria-hidden="true">
@@ -207,6 +272,7 @@
 
   <script>
     window.__EMOJI__ = {{.EmojiJSON}};
+    window.__BOOT__ = {{.BootJSON}};
   </script>
   <script>
 (function () {
@@ -215,10 +281,33 @@
   var squares = document.querySelectorAll('.square');
   var backdrop = document.getElementById('backdrop');
   var grid = document.getElementById('grid');
+  var statusSlot = document.getElementById('status-slot');
+  var submitBtn = document.getElementById('submit-btn');
+  var boot = window.__BOOT__ || { failures: 0, locked: false };
   var activeIndex = 0;
   var squareLabels = ['першого', 'другого', 'третього'];
 
+  function msgForFailures(n, locked) {
+    if (locked || n >= 3) return 'Ви не відгадали';
+    if (n === 1) return 'У вас лишилось 2 спроби';
+    if (n === 2) return 'У вас лишилась остання спроба';
+    return '';
+  }
+
+  function setStatus(n, locked) {
+    statusSlot.textContent = msgForFailures(n, locked);
+    statusSlot.classList.toggle('is-final', locked || n >= 3);
+  }
+
+  function applyLocked() {
+    boot.locked = true;
+    squares.forEach(function (sq) { sq.disabled = true; });
+    if (submitBtn) submitBtn.hidden = true;
+    setStatus(3, true);
+  }
+
   function openPicker(index) {
+    if (boot.locked || squares[index].disabled) return;
     activeIndex = index;
     var key = keys[index];
     var items = lists[key] || [];
@@ -246,6 +335,7 @@
   function setSquare(index, emoji) {
     var sq = squares[index];
     sq.textContent = emoji;
+    sq.classList.add('picked');
     sq.setAttribute('aria-label', 'Змінити емодзі для ' + squareLabels[index] + ' квадрата, зараз ' + emoji);
   }
 
@@ -260,6 +350,54 @@
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' && backdrop.classList.contains('open')) closePicker();
   });
+
+  if (submitBtn && !boot.locked) {
+    submitBtn.addEventListener('click', function () {
+      var picks = [];
+      for (var i = 0; i < squares.length; i++) {
+        if (!squares[i].classList.contains('picked')) {
+          statusSlot.textContent = 'Оберіть усі три емодзі';
+          statusSlot.classList.remove('is-final');
+          return;
+        }
+        picks.push(squares[i].textContent.trim());
+      }
+
+      submitBtn.disabled = true;
+
+      fetch('/guess', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify(picks),
+      }).then(function (res) {
+        return res.json().then(function (data) {
+          return { res: res, data: data };
+        });
+      }).then(function (o) {
+        var data = o.data;
+        if (data.ok && data.redirect) {
+          window.location.href = data.redirect;
+          return;
+        }
+        if (data.error && !data.failures) {
+          statusSlot.textContent = data.error;
+          statusSlot.classList.remove('is-final');
+          return;
+        }
+        var f = data.failures != null ? data.failures : boot.failures;
+        var locked = !!data.locked || f >= 3;
+        boot.failures = f;
+        if (locked) applyLocked();
+        else setStatus(f, false);
+      }).catch(function () {
+        statusSlot.textContent = 'Помилка мережі. Спробуйте ще раз.';
+        statusSlot.classList.remove('is-final');
+      }).finally(function () {
+        if (submitBtn && !submitBtn.hidden) submitBtn.disabled = false;
+      });
+    });
+  }
 })();
   </script>
 </body>
