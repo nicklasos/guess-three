@@ -10,7 +10,7 @@ Guess three
 
 ## Deploy
 ```bash
-sudo cp /var/www/guess/guess-three.conf /etc/supervisor/conf.d/ && \
+sudo cp /var/www/guess-three/guess-three.conf /etc/supervisor/conf.d/ && \
 sudo mkdir -p /var/log/guess && \
 sudo chown www-data:www-data /var/log/guess && \
 sudo supervisorctl reread && \
