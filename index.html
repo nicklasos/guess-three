@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Обери три</title>
+  <title>Обери п’ять</title>
   <link rel="icon" href="/favicon.ico" type="image/svg+xml">
   <style>
     *, *::before, *::after { box-sizing: border-box; }
@@ -20,13 +20,13 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: clamp(1rem, 4vw, 2rem);
+      padding: clamp(0.75rem, 3vw, 2rem);
     }
     .game {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: clamp(1.5rem, 5vw, 2.25rem);
+      gap: clamp(1.35rem, 5vw, 2.25rem);
       max-width: 100%;
     }
     .row {
@@ -34,33 +34,34 @@
       flex-wrap: wrap;
       align-items: flex-end;
       justify-content: center;
-      gap: clamp(0.75rem, 5vw, 1.5rem);
+      gap: clamp(0.35rem, 2.5vw, 1rem);
       max-width: 100%;
     }
     .slot {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.4rem;
     }
     .label {
-      font-size: clamp(1.25rem, 5vw, 1.75rem);
+      font-size: clamp(1.15rem, 5.4vw, 1.95rem);
       line-height: 1;
       user-select: none;
     }
     .square {
-      width: min(22vw, 5.5rem);
-      height: min(22vw, 5.5rem);
-      min-width: 4.25rem;
-      min-height: 4.25rem;
+      width: clamp(2.55rem, 14vw, 5.85rem);
+      height: clamp(2.55rem, 14vw, 5.85rem);
+      min-width: 2.55rem;
+      min-height: 2.55rem;
       border: 2px solid #3a3f58;
-      border-radius: 0.5rem;
+      border-radius: 0.45rem;
       background: #232330;
+      color: #e8e9ee;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      font-size: clamp(1.75rem, 8vw, 2.5rem);
+      font-size: clamp(1.2rem, 5.25vw + 0.55rem, 2.55rem);
       line-height: 1;
       transition: border-color 0.15s, background 0.15s;
       padding: 0;
@@ -73,12 +74,25 @@
     .square:focus-visible {
       box-shadow: 0 0 0 3px rgba(108, 156, 255, 0.35);
     }
-    .square .placeholder { color: #5c627a; font-size: 0.9rem; }
     .square:disabled {
       opacity: 0.45;
       cursor: not-allowed;
     }
     .square:disabled:hover { border-color: #3a3f58; }
+
+    @media (min-width: 560px) {
+      .square {
+        width: clamp(3.75rem, 12vw, 5.85rem);
+        height: clamp(3.75rem, 12vw, 5.85rem);
+        min-width: 3.75rem;
+        min-height: 3.75rem;
+        border-radius: 0.5rem;
+        font-size: clamp(1.55rem, 4vw + 0.85rem, 2.65rem);
+      }
+      .row { gap: clamp(0.6rem, 4vw, 1.35rem); }
+      .slot { gap: 0.5rem; }
+      .label { font-size: clamp(1.35rem, 4.5vw, 2.1rem); }
+    }
 
     .status-slot {
       box-sizing: border-box;
@@ -123,7 +137,7 @@
       appearance: none;
       border: none;
       cursor: pointer;
-      min-width: min(100%, 16rem);
+      min-width: min(100%, 18rem);
       padding: 0.875rem 2rem;
       font-family: inherit;
       font-size: 1rem;
@@ -199,12 +213,13 @@
       max-height: min(70vh, 28rem);
       overflow: auto;
       box-shadow: 0 16px 48px rgba(0, 0, 0, 0.38);
+      color: #e8e9ee;
     }
     .sheet h2 {
       margin: 0 0 0.75rem;
       font-size: 0.9rem;
       font-weight: 600;
-      color: #a8adbf;
+      color: inherit;
     }
     .grid {
       display: grid;
@@ -218,6 +233,7 @@
       border: 1px solid transparent;
       border-radius: 0.35rem;
       background: #303040;
+      color: #e8e9ee;
       font-size: 1.5rem;
       line-height: 1;
       cursor: pointer;
@@ -238,28 +254,30 @@
   <div class="row" id="row">
     <div class="slot" data-key="a">
       <span class="label" aria-hidden="true">1️⃣</span>
-      <button type="button" class="square" data-index="0" aria-label="Оберіть емодзі для першого квадрата"{{if .Locked}} disabled{{end}}>
-        <span class="placeholder">Торкніться</span>
-      </button>
+      <button type="button" class="square" data-index="0" aria-label="Оберіть емодзі для першого квадрата"></button>
     </div>
     <div class="slot" data-key="b">
       <span class="label" aria-hidden="true">2️⃣</span>
-      <button type="button" class="square" data-index="1" aria-label="Оберіть емодзі для другого квадрата"{{if .Locked}} disabled{{end}}>
-        <span class="placeholder">Торкніться</span>
-      </button>
+      <button type="button" class="square" data-index="1" aria-label="Оберіть емодзі для другого квадрата"></button>
     </div>
     <div class="slot" data-key="c">
       <span class="label" aria-hidden="true">3️⃣</span>
-      <button type="button" class="square" data-index="2" aria-label="Оберіть емодзі для третього квадрата"{{if .Locked}} disabled{{end}}>
-        <span class="placeholder">Торкніться</span>
-      </button>
+      <button type="button" class="square" data-index="2" aria-label="Оберіть емодзі для третього квадрата"></button>
+    </div>
+    <div class="slot" data-key="d">
+      <span class="label" aria-hidden="true">🌃</span>
+      <button type="button" class="square" data-index="3" aria-label="Оберіть емодзі для четвертого квадрата"></button>
+    </div>
+    <div class="slot" data-key="e">
+      <span class="label" aria-hidden="true">💡</span>
+      <button type="button" class="square" data-index="4" aria-label="Оберіть емодзі для п’ятого квадрата"></button>
     </div>
   </div>
 
-  <p class="status-slot{{if .Locked}} is-final{{end}}" id="status-slot" role="status" aria-live="polite">{{.StatusText}}</p>
+  <p class="status-slot" id="status-slot" role="status" aria-live="polite"></p>
 
   <div class="submit-zone">
-  <button type="button" class="submit-btn" id="submit-btn"{{if .Locked}} hidden{{end}}>Відправити</button>
+  <button type="button" class="submit-btn" id="submit-btn">Отримати програму</button>
   </div>
   </div>
 
@@ -272,42 +290,27 @@
 
   <script>
     window.__EMOJI__ = {{.EmojiJSON}};
-    window.__BOOT__ = {{.BootJSON}};
   </script>
   <script>
 (function () {
   var lists = window.__EMOJI__;
-  var keys = ['a', 'b', 'c'];
+  var keys = ['a', 'b', 'c', 'd', 'e'];
   var squares = document.querySelectorAll('.square');
   var backdrop = document.getElementById('backdrop');
   var grid = document.getElementById('grid');
   var statusSlot = document.getElementById('status-slot');
   var submitBtn = document.getElementById('submit-btn');
-  var boot = window.__BOOT__ || { failures: 0, locked: false };
   var activeIndex = 0;
-  var squareLabels = ['першого', 'другого', 'третього'];
+  var squareLabels = ['першого', 'другого', 'третього', 'четвертого', 'п’ятого'];
 
-  function msgForFailures(n, locked) {
-    if (locked || n >= 3) return 'Ви не відгадали';
-    if (n === 1) return 'У вас лишилось 2 спроби';
-    if (n === 2) return 'У вас лишилась остання спроба';
-    return '';
-  }
-
-  function setStatus(n, locked) {
-    statusSlot.textContent = msgForFailures(n, locked);
-    statusSlot.classList.toggle('is-final', locked || n >= 3);
-  }
-
-  function applyLocked() {
-    boot.locked = true;
-    squares.forEach(function (sq) { sq.disabled = true; });
-    if (submitBtn) submitBtn.hidden = true;
-    setStatus(3, true);
+  function clearIncorrectStatus() {
+    statusSlot.textContent = '';
+    statusSlot.classList.remove('is-final');
   }
 
   function openPicker(index) {
-    if (boot.locked || squares[index].disabled) return;
+    clearIncorrectStatus();
+    if (squares[index].disabled) return;
     activeIndex = index;
     var key = keys[index];
     var items = lists[key] || [];
@@ -333,6 +336,7 @@
   }
 
   function setSquare(index, emoji) {
+    clearIncorrectStatus();
     var sq = squares[index];
     sq.textContent = emoji;
     sq.classList.add('picked');
@@ -351,12 +355,12 @@
     if (e.key === 'Escape' && backdrop.classList.contains('open')) closePicker();
   });
 
-  if (submitBtn && !boot.locked) {
+  if (submitBtn) {
     submitBtn.addEventListener('click', function () {
       var picks = [];
       for (var i = 0; i < squares.length; i++) {
         if (!squares[i].classList.contains('picked')) {
-          statusSlot.textContent = 'Оберіть усі три емодзі';
+          statusSlot.textContent = 'Оберіть усі п’ять емодзі';
           statusSlot.classList.remove('is-final');
           return;
         }
@@ -380,16 +384,16 @@
           window.location.href = data.redirect;
           return;
         }
-        if (data.error && !data.failures) {
+        if (data.error) {
           statusSlot.textContent = data.error;
           statusSlot.classList.remove('is-final');
           return;
         }
-        var f = data.failures != null ? data.failures : boot.failures;
-        var locked = !!data.locked || f >= 3;
-        boot.failures = f;
-        if (locked) applyLocked();
-        else setStatus(f, false);
+        if (!data.ok) {
+          statusSlot.textContent = 'Невірно. Оберіть іншу комбінацію.';
+          statusSlot.classList.remove('is-final');
+          return;
+        }
       }).catch(function () {
         statusSlot.textContent = 'Помилка мережі. Спробуйте ще раз.';
         statusSlot.classList.remove('is-final');
