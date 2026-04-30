@@ -8,6 +8,14 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html { height: 100%; }
+
+    button:not(:disabled) {
+      cursor: pointer;
+    }
+    button:disabled {
+      cursor: not-allowed;
+    }
+
     body {
       margin: 0;
       min-height: 100%;
@@ -60,7 +68,6 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      cursor: pointer;
       font-size: clamp(1.2rem, 5.25vw + 0.55rem, 2.55rem);
       line-height: 1;
       transition: border-color 0.15s, background 0.15s;
@@ -76,7 +83,6 @@
     }
     .square:disabled {
       opacity: 0.45;
-      cursor: not-allowed;
     }
     .square:disabled:hover { border-color: #3a3f58; }
 
@@ -136,7 +142,6 @@
     .submit-btn {
       appearance: none;
       border: none;
-      cursor: pointer;
       min-width: min(100%, 18rem);
       padding: 0.875rem 2rem;
       font-family: inherit;
@@ -177,7 +182,6 @@
     }
     .submit-btn:disabled {
       opacity: 0.55;
-      cursor: not-allowed;
       filter: grayscale(0.15);
       transform: none;
       box-shadow:
@@ -203,7 +207,10 @@
       padding: 1rem;
       z-index: 100;
     }
-    .backdrop.open { display: flex; }
+    .backdrop.open {
+      display: flex;
+      cursor: pointer;
+    }
     .sheet {
       background: #282836;
       border: 1px solid #3a3f58;
@@ -214,6 +221,7 @@
       overflow: auto;
       box-shadow: 0 16px 48px rgba(0, 0, 0, 0.38);
       color: #e8e9ee;
+      cursor: default;
     }
     .sheet h2 {
       margin: 0 0 0.75rem;
@@ -236,7 +244,6 @@
       color: #e8e9ee;
       font-size: 1.5rem;
       line-height: 1;
-      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
