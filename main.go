@@ -14,14 +14,14 @@ import (
 
 type Config struct {
 	A       string
-	A_OTHER string
 	B       string
-	B_OTHER string
 	C       string
-	C_OTHER string
 	D       string
-	D_OTHER string
 	E       string
+	A_OTHER string
+	B_OTHER string
+	C_OTHER string
+	D_OTHER string
 	E_OTHER string
 	Link    string
 }
@@ -106,14 +106,14 @@ func main() {
 
 	cfg := Config{
 		A:       strings.TrimSpace(os.Getenv("A")),
-		A_OTHER: os.Getenv("A_OTHER"),
 		B:       strings.TrimSpace(os.Getenv("B")),
-		B_OTHER: os.Getenv("B_OTHER"),
 		C:       strings.TrimSpace(os.Getenv("C")),
-		C_OTHER: os.Getenv("C_OTHER"),
 		D:       strings.TrimSpace(os.Getenv("D")),
-		D_OTHER: os.Getenv("D_OTHER"),
 		E:       strings.TrimSpace(os.Getenv("E")),
+		A_OTHER: os.Getenv("A_OTHER"),
+		B_OTHER: os.Getenv("B_OTHER"),
+		C_OTHER: os.Getenv("C_OTHER"),
+		D_OTHER: os.Getenv("D_OTHER"),
 		E_OTHER: os.Getenv("E_OTHER"),
 		Link:    strings.TrimSpace(os.Getenv("LINK")),
 	}
@@ -137,7 +137,7 @@ func main() {
 
 	addr := os.Getenv("PORT")
 	if addr == "" {
-		addr = "8080"
+		addr = "8786"
 	}
 	if addr[0] != ':' {
 		addr = ":" + addr
