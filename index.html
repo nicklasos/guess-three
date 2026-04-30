@@ -9,11 +9,27 @@
     *, *::before, *::after { box-sizing: border-box; }
     html { height: 100%; }
 
+    /* Hover/cursor styles only where they apply (avoid sticky hover + odd focus on touch). */
+    button {
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
     button:not(:disabled) {
-      cursor: pointer;
+      cursor: default;
     }
     button:disabled {
-      cursor: not-allowed;
+      cursor: default;
+    }
+    @media (hover: hover) and (pointer: fine) {
+      button:not(:disabled) {
+        cursor: pointer;
+      }
+      button:disabled {
+        cursor: not-allowed;
+      }
     }
 
     body {
@@ -72,19 +88,24 @@
       line-height: 1;
       transition: border-color 0.15s, background 0.15s;
       padding: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .square:hover, .square:focus-visible {
-      border-color: #6c9cff;
       outline: none;
     }
+    @media (hover: hover) and (pointer: fine) {
+      .square:hover {
+        border-color: #6c9cff;
+      }
+    }
     .square:focus-visible {
+      border-color: #6c9cff;
       box-shadow: 0 0 0 3px rgba(108, 156, 255, 0.35);
     }
     .square:disabled {
       opacity: 0.45;
     }
-    .square:disabled:hover { border-color: #3a3f58; }
+    .square:active:not(:disabled) {
+      border-color: #5578d6;
+      background: #2a2b3d;
+    }
 
     @media (min-width: 560px) {
       .square {
@@ -156,14 +177,16 @@
         0 4px 14px rgba(91, 127, 255, 0.45),
         0 2px 4px rgba(0, 0, 0, 0.25);
       transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
-      -webkit-tap-highlight-color: transparent;
+      outline: none;
     }
-    .submit-btn:hover {
-      filter: brightness(1.06);
-      box-shadow:
-        0 1px 0 rgba(255, 255, 255, 0.25) inset,
-        0 6px 20px rgba(91, 127, 255, 0.55),
-        0 2px 6px rgba(0, 0, 0, 0.3);
+    @media (hover: hover) and (pointer: fine) {
+      .submit-btn:hover:not(:disabled) {
+        filter: brightness(1.06);
+        box-shadow:
+          0 1px 0 rgba(255, 255, 255, 0.25) inset,
+          0 6px 20px rgba(91, 127, 255, 0.55),
+          0 2px 6px rgba(0, 0, 0, 0.3);
+      }
     }
     .submit-btn:active {
       transform: translateY(1px);
@@ -189,12 +212,14 @@
         0 2px 8px rgba(91, 127, 255, 0.2),
         0 1px 2px rgba(0, 0, 0, 0.2);
     }
-    .submit-btn:disabled:hover {
-      filter: grayscale(0.15);
-      box-shadow:
-        0 1px 0 rgba(255, 255, 255, 0.12) inset,
-        0 2px 8px rgba(91, 127, 255, 0.2),
-        0 1px 2px rgba(0, 0, 0, 0.2);
+    @media (hover: hover) and (pointer: fine) {
+      .submit-btn:disabled:hover {
+        filter: grayscale(0.15);
+        box-shadow:
+          0 1px 0 rgba(255, 255, 255, 0.12) inset,
+          0 2px 8px rgba(91, 127, 255, 0.2),
+          0 1px 2px rgba(0, 0, 0, 0.2);
+      }
     }
 
     .backdrop {
@@ -209,7 +234,11 @@
     }
     .backdrop.open {
       display: flex;
-      cursor: pointer;
+    }
+    @media (hover: hover) and (pointer: fine) {
+      .backdrop.open {
+        cursor: pointer;
+      }
     }
     .sheet {
       background: #282836;
@@ -247,12 +276,21 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      -webkit-tap-highlight-color: transparent;
+      outline: none;
     }
-    .emoji-btn:hover, .emoji-btn:focus-visible {
+    @media (hover: hover) and (pointer: fine) {
+      .emoji-btn:hover {
+        border-color: #6c9cff;
+        background: #363d5a;
+      }
+    }
+    .emoji-btn:focus-visible {
       border-color: #6c9cff;
       background: #363d5a;
-      outline: none;
+      box-shadow: 0 0 0 2px rgba(108, 156, 255, 0.45);
+    }
+    .emoji-btn:active {
+      background: #2f3550;
     }
   </style>
 </head>
