@@ -7,7 +7,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/joho/godotenv"
 )
@@ -64,7 +66,7 @@ func writeGuessJSON(w http.ResponseWriter, status int, gr guessResponse) {
 	}
 }
 
-func handleGuess(w http.ResponseWriter, r *http.Request, ansA, ansB, ansC, ansD, ansE, winLink string) {
+func handleGuess(w http.ResponseWriter, r *http.Request, ansA, ansB, ansC, ansD, ansE, winLink string, throttle time.Duration) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -91,6 +93,10 @@ func handleGuess(w http.ResponseWriter, r *http.Request, ansA, ansB, ansC, ansD,
 			writeGuessJSON(w, http.StatusBadRequest, guessResponse{OK: false, Error: "пусте емодзі"})
 			return
 		}
+	}
+
+	if throttle > 0 {
+		time.Sleep(throttle)
 	}
 
 	if picks[0] == ansA && picks[1] == ansB && picks[2] == ansC && picks[3] == ansD && picks[4] == ansE {
@@ -144,13 +150,14 @@ func main() {
 	}
 
 	tpl := template.Must(template.ParseFiles("index.html"))
+	throttle := guessThrottleFromEnv()
 
 	http.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "favicon.svg")
 	})
 
 	http.HandleFunc("/guess", func(w http.ResponseWriter, r *http.Request) {
-		handleGuess(w, r, cfg.A, cfg.B, cfg.C, cfg.D, cfg.E, cfg.Link)
+		handleGuess(w, r, cfg.A, cfg.B, cfg.C, cfg.D, cfg.E, cfg.Link, throttle)
 	})
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -188,4 +195,22 @@ func main() {
 
 	log.Printf("serving index.html on http://localhost%s", addr)
 	log.Fatal(http.ListenAndServe(addr, nil))
+}
+
+// guessThrottleFromEnv returns delay before scoring a valid 5-pick attempt.
+// GUESS_DELAY_MS: empty defaults to 2000; "0" disables; negative values are treated as 0.
+func guessThrottleFromEnv() time.Duration {
+	s := strings.TrimSpace(os.Getenv("GUESS_DELAY_MS"))
+	if s == "" {
+		return 2 * time.Second
+	}
+	ms, err := strconv.Atoi(s)
+	if err != nil {
+		log.Printf("invalid GUESS_DELAY_MS %q, using 2s", s)
+		return 2 * time.Second
+	}
+	if ms <= 0 {
+		return 0
+	}
+	return time.Duration(ms) * time.Millisecond
 }

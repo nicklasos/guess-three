@@ -62,7 +62,7 @@ func TestHandleGuess(t *testing.T) {
 		t.Parallel()
 		rr := httptest.NewRecorder()
 		req := httptest.NewRequest(http.MethodGet, "/guess", nil)
-		handleGuess(rr, req, a, b, c, d, e, winURL)
+		handleGuess(rr, req, a, b, c, d, e, winURL, 0)
 
 		if rr.Code != http.StatusMethodNotAllowed {
 			t.Fatalf("status %d", rr.Code)
@@ -73,7 +73,7 @@ func TestHandleGuess(t *testing.T) {
 		t.Parallel()
 		rr := httptest.NewRecorder()
 		req := httptest.NewRequest(http.MethodPost, "/guess", strings.NewReader("not-json"))
-		handleGuess(rr, req, a, b, c, d, e, winURL)
+		handleGuess(rr, req, a, b, c, d, e, winURL, 0)
 
 		if rr.Code != http.StatusBadRequest {
 			t.Fatalf("status want 400 got %d", rr.Code)
@@ -92,7 +92,7 @@ func TestHandleGuess(t *testing.T) {
 		rr := httptest.NewRecorder()
 		body := mustJSON(t, []string{"🚕", "🐇", "🔮"})
 		req := httptest.NewRequest(http.MethodPost, "/guess", strings.NewReader(body))
-		handleGuess(rr, req, a, b, c, d, e, winURL)
+		handleGuess(rr, req, a, b, c, d, e, winURL, 0)
 
 		if rr.Code != http.StatusBadRequest {
 			t.Fatalf("status want 400 got %d", rr.Code)
@@ -108,7 +108,7 @@ func TestHandleGuess(t *testing.T) {
 		rr := httptest.NewRecorder()
 		body := mustJSON(t, []string{"🚕", "🐇", "🔮", "🌃", "   "})
 		req := httptest.NewRequest(http.MethodPost, "/guess", strings.NewReader(body))
-		handleGuess(rr, req, a, b, c, d, e, winURL)
+		handleGuess(rr, req, a, b, c, d, e, winURL, 0)
 
 		if rr.Code != http.StatusBadRequest {
 			t.Fatalf("status want 400 got %d", rr.Code)
@@ -124,7 +124,7 @@ func TestHandleGuess(t *testing.T) {
 		rr := httptest.NewRecorder()
 		body := mustJSON(t, []string{"🚕", "🐇", "🔮", "🌃", "⭐"})
 		req := httptest.NewRequest(http.MethodPost, "/guess", strings.NewReader(body))
-		handleGuess(rr, req, a, b, c, d, e, winURL)
+		handleGuess(rr, req, a, b, c, d, e, winURL, 0)
 
 		if rr.Code != http.StatusOK {
 			t.Fatalf("status want 200 got %d", rr.Code)
@@ -143,7 +143,7 @@ func TestHandleGuess(t *testing.T) {
 		rr := httptest.NewRecorder()
 		body := mustJSON(t, []string{" " + a + " ", b, c, d, e})
 		req := httptest.NewRequest(http.MethodPost, "/guess", strings.NewReader(body))
-		handleGuess(rr, req, a, b, c, d, e, winURL)
+		handleGuess(rr, req, a, b, c, d, e, winURL, 0)
 
 		if rr.Code != http.StatusOK {
 			t.Fatalf("status %d body %s", rr.Code, rr.Body.String())
